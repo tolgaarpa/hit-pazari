@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0b0b0d">
+<title>Hit Pazarı</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0d;--ink:#f2efe9;--muted:#8a867f;--line:#25252a}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:"Space Grotesk",system-ui,sans-serif;overflow:hidden;overscroll-behavior:none}
+#dunya{position:absolute;inset:0;touch-action:none;background:var(--bg)}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.tust{position:absolute;top:0;left:0;right:0;padding:calc(12px + env(safe-area-inset-top)) 16px 14px;pointer-events:none;background:linear-gradient(#0b0b0df0,#0b0b0d00);z-index:5}
+.satir{display:flex;flex-direction:column;gap:10px}
+.logo{font-family:Fraunces,serif;font-size:26px;letter-spacing:-.02em;line-height:1}
+.alt{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+.mod{display:flex;gap:6px;pointer-events:auto}
+.pill{background:transparent;color:var(--ink);border:1px solid #3a3a40;border-radius:999px;padding:8px 12px;font:500 11px "Space Grotesk";letter-spacing:.06em;cursor:pointer}
+.pill.on{background:var(--ink);color:#111;border-color:var(--ink)}
+#sokakBar{display:none;margin-top:12px;pointer-events:none;text-align:center}
+#sokakBar.on{display:block}
+#tabela{display:inline-block;font-family:Fraunces,serif;font-style:italic;font-size:19px;padding:7px 18px;border:1px solid #6b665d;border-radius:4px;background:#1a1a1ecc}
+#secici{display:flex;gap:6px;justify-content:center;margin-top:8px;pointer-events:auto}
+#sonu{position:absolute;left:0;right:0;top:46%;text-align:center;z-index:4;pointer-events:none;opacity:0;transition:opacity .4s}
+#sonu.on{opacity:1}
+#sonu b{display:block;font:italic 300 26px Fraunces,serif}
+#sonu span{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+.ipucu{position:absolute;left:0;right:0;bottom:0;padding:18px 18px calc(16px + env(safe-area-inset-bottom));text-align:center;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);background:linear-gradient(#0b0b0d00,#0b0b0dee 50%);pointer-events:none;z-index:4}
+#secim{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.9);background:var(--ink);color:#111;padding:10px 18px;border-radius:999px;font:600 13px "Space Grotesk";opacity:0;pointer-events:none;transition:.15s;z-index:8;white-space:nowrap}
+#secim.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#bsheet,#sheet{position:absolute;left:0;right:0;bottom:0;z-index:9;background:#141417;border-top:1px solid var(--line);border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .3s ease;max-width:520px;margin:0 auto;touch-action:none}
+#sheet.on,#bsheet.on{transform:none}
+#bsheet img,#sheet img{width:100%;max-height:34vh;object-fit:cover;border-radius:10px;display:block;border:1px solid #2c2c32}
+#bsheet h2,#sheet h2{font-family:Fraunces,serif;font-weight:500;font-size:26px;margin-top:12px;letter-spacing:-.01em}
+#bsheet p,#sheet p{color:var(--muted);font-size:13px;margin-top:4px}
+#yakinda{color:#f2c14e;font-size:13px;margin-top:10px;display:none}
+.dugmeler{display:flex;gap:10px;margin-top:14px}
+.dugmeler button{flex:1;border-radius:999px;padding:13px 10px;font:600 12px "Space Grotesk";letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+#gir{background:var(--ink);color:#111;border:0}
+#kapat{background:transparent;color:var(--ink);border:1px solid #3a3a40}
+
+#kaydir{display:none;position:absolute;inset:0;z-index:3}
+body.kd #kaydir{display:block}body.kd #dunya,body.kd .ipucu,body.kd #sonu{display:none}
+#deste{position:absolute;left:16px;right:16px;top:calc(110px + env(safe-area-inset-top));bottom:calc(96px + env(safe-area-inset-bottom));max-width:440px;margin:0 auto}
+.kart{position:absolute;inset:0;border-radius:22px;background:#141417;overflow:hidden;touch-action:none;user-select:none;will-change:transform;box-shadow:0 18px 40px rgba(0,0,0,.45);border:1px solid var(--line)}
+.kart img{position:absolute;left:0;top:0;width:100%;height:calc(100% - 96px);object-fit:cover;pointer-events:none;-webkit-user-drag:none}
+.kart .bilgi{position:absolute;left:0;right:0;bottom:0;height:96px;padding:14px 18px;background:#111114;border-top:1px solid var(--line)}
+.kart .kat{font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.kart h2{font-family:Fraunces,serif;font-weight:400;font-size:25px;letter-spacing:-.02em;margin:4px 0}
+.kart p{font-size:12px;color:#b9b5ad}
+.damga{position:absolute;font-weight:600;font-size:20px;letter-spacing:.12em;padding:6px 12px;border:3px solid;border-radius:10px;opacity:0;pointer-events:none;text-transform:uppercase;background:#0b0b0d99}
+.d-like{top:24px;left:20px;color:#5fd38a;transform:rotate(-12deg)}.d-nope{top:24px;right:20px;color:#ef6b6b;transform:rotate(12deg)}
+.d-gir{top:24px;left:50%;transform:translateX(-50%);color:#f2c14e;white-space:nowrap}.d-bilgi{bottom:112px;left:50%;transform:translateX(-50%);color:#6bb6ef;white-space:nowrap}
+.bos{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:var(--muted)}
+.bos b{display:block;font:italic 300 28px Fraunces,serif;color:var(--ink);margin-bottom:14px}
+.bos button{background:var(--ink);color:#111;border:0;border-radius:999px;padding:12px 22px;font:600 12px "Space Grotesk";letter-spacing:.14em;text-transform:uppercase}
+#kdugme{position:absolute;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 16px calc(14px + env(safe-area-inset-bottom));max-width:472px;margin:0 auto}
+#kdugme button{background:#141417;border:1px solid var(--line);border-radius:14px;padding:12px 2px;font:500 10px "Space Grotesk";letter-spacing:.1em;text-transform:uppercase}
+#ktoast{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--ink);color:#111;padding:10px 18px;border-radius:999px;font:600 13px "Space Grotesk";opacity:0;pointer-events:none;transition:.2s;z-index:12;white-space:nowrap}
+#ktoast.on{opacity:1}
+#bsheet .satir2{color:var(--muted);font-size:13px;margin-top:6px}
+</style>
+</head>
+<body>
+<div id="dunya"><canvas id="cv"></canvas></div>
+<div class="tust">
+  <div class="satir">
+    <div><div class="logo">Hit Pazarı</div><div class="alt">Çankaya · Tunalı &amp; Ayrancı</div></div>
+    <div class="mod"><button class="pill on" id="mSanal">Sanal dünya</button><button class="pill" id="mSokak">Sokak</button><button class="pill" id="mKaydir">Kaydır</button></div>
+  </div>
+  <div id="sokakBar"><div id="tabela"></div>
+    <div id="secici"><button class="pill on" data-s="Tunalı Hilmi Caddesi">Tunalı</button><button class="pill" data-s="Ayrancı · Hoşdere Caddesi">Ayrancı</button></div>
+  </div>
+</div>
+<div id="sonu"><b id="sonuAd"></b><span>sokak sonu</span></div>
+<div class="ipucu">Kaydır: ilerle · Dokun: vitrine bak</div>
+<div id="secim"></div>
+<div id="kaydir"><div id="deste"></div>
+<div id="kdugme"><button data-y="sol" style="color:#ef6b6b">Geç</button><button data-y="yukari" style="color:#f2c14e">Dükkâna gir</button><button data-y="asagi" style="color:#6bb6ef">Bilgi</button><button data-y="sag" style="color:#5fd38a">Beğen</button></div></div>
+<div id="ktoast"></div>
+
+<div id="bsheet" class="bs"><img id="bImg" alt=""><h2 id="bAd"></h2><p id="bBilgi"></p>
+<div class="satir2">Çalışma saatleri: girilecek</div><div class="satir2">Telefon: girilecek</div>
+<div class="dugmeler"><button id="bKapat" style="background:transparent;color:var(--ink);border:1px solid #3a3a40">Kapat</button></div></div>
+<div id="sheet">
+  <img id="shImg" alt="">
+  <h2 id="shAd"></h2><p id="shBilgi"></p>
+  <div id="yakinda">Bu dükkân yakında açılıyor</div>
+  <div class="dugmeler"><button id="gir">Dükkâna gir</button><button id="kapat">Kapat</button></div>
+</div>
+<script src="dukkanlar.js"></script>
+<script>
+(()=>{
+const wrap=document.getElementById('dunya'),cv=document.getElementById('cv'),g=cv.getContext('2d');
+const BG='#0b0b0d',P=600,SOKAKLAR=["Tunalı Hilmi Caddesi","Ayrancı · Hoşdere Caddesi"];
+const q=new URLSearchParams(location.search);
+let mod=q.get('mod')==='sokak'?'sokak':q.get('mod')==='kaydir'?'kaydir':'sanal',sokak=SOKAKLAR[q.get('s')==='1'?1:0];
+let DPR=1,VW=0,VH=0;
+function boyut(){DPR=Math.min(devicePixelRatio||1,2);const r=wrap.getBoundingClientRect();VW=r.width;VH=r.height;cv.width=Math.round(VW*DPR);cv.height=Math.round(VH*DPR)}
+boyut();addEventListener('resize',boyut);
+const IMG={};DUKKANLAR.forEach(d=>{const im=new Image();im.src='vitrin/'+d.id+'.webp';IMG[d.id]=im});
+// kopya sırasına göre deterministik filtreler (yalnız sanal dünya)
+const FILTRE=['none','hue-rotate(40deg) saturate(1.3)','sepia(.8) contrast(1.05)','grayscale(1) contrast(1.15)','hue-rotate(160deg) saturate(1.4)','saturate(1.8) contrast(1.1)','sepia(.5) hue-rotate(-30deg) saturate(1.5)','hue-rotate(250deg) contrast(1.1)','grayscale(.6) sepia(.4)','hue-rotate(310deg) saturate(1.6) brightness(1.05)'];
+const TEKRAR=10,STEP_S=120,STEP_K=230;
+let items=[],TOTAL=0,camZ=0,target=0,drawn=[];
+function kur(){
+  items=[];
+  if(mod==='sanal'){
+    const L=[];for(let t=0;t<TEKRAR;t++)DUKKANLAR.forEach(d=>L.push({d,f:FILTRE[t%FILTRE.length]}));
+    L.forEach((o,i)=>{const X=1.0,Y=0.95,per=2*(2*X+2*Y),p=((i*0.6180339)%1)*per;let xv,yv;
+      if(p<2*X){xv=-X+p;yv=-Y}else if(p<2*X+2*Y){xv=X;yv=-Y+(p-2*X)}else if(p<4*X+2*Y){xv=X-(p-2*X-2*Y);yv=Y}else{xv=-X;yv=Y-(p-4*X-2*Y)}
+      items.push({d:o.d,f:o.f,x:xv,y:yv,z:-(i*STEP_S)-250,wf:0.68,rot:(((i*0.5698)%1)-0.5)*5*Math.PI/180,sx:0,sy:0,sw:0,sh:0,op:0,dz:0})});
+    TOTAL=(L.length+1)*STEP_S;
+  }else{
+    const L=DUKKANLAR.filter(d=>d.sokak===sokak).sort((a,b)=>a.no-b.no);
+    L.forEach((d,i)=>items.push({d,f:'none',x:(i%2?1:-1)*0.95,y:-0.05,z:-(i*STEP_K)-420,wf:0.6,rot:0,sx:0,sy:0,sw:0,sh:0,op:0,dz:0}));
+    TOTAL=(L.length-1)*STEP_K+900;
+  }
+  camZ=target=0;
+}
+const zq=parseFloat(q.get('z'));
+function ayarla(){
+  document.getElementById('mSanal').classList.toggle('on',mod==='sanal');
+  document.getElementById('mSokak').classList.toggle('on',mod==='sokak');
+  document.getElementById('sokakBar').classList.toggle('on',mod==='sokak');
+  document.getElementById('tabela').textContent=sokak;
+  document.getElementById('sonuAd').textContent=sokak;
+  document.querySelectorAll('#secici .pill').forEach(b=>b.classList.toggle('on',b.dataset.s===sokak));
+  document.getElementById('mKaydir').classList.toggle('on',mod==='kaydir');
+  document.body.classList.toggle('kd',mod==='kaydir');
+  if(mod==='kaydir'){kDeste();return}
+  kur();if(!calisiyor){calisiyor=true;requestAnimationFrame(render)}
+}
+document.getElementById('mSanal').onclick=()=>{mod='sanal';ayarla()};
+document.getElementById('mKaydir').onclick=()=>{mod='kaydir';ayarla()};
+document.getElementById('mSokak').onclick=()=>{mod='sokak';ayarla()};
+document.querySelectorAll('#secici .pill').forEach(b=>b.onclick=()=>{sokak=b.dataset.s;ayarla()});
+
+// ---- Kaydır modu ----
+const deste=document.getElementById('deste'),bsheet=document.getElementById('bsheet'),kt=document.getElementById('ktoast');
+let kSira=0,kAktif=null,calisiyor=true;
+function begeniler(){try{return JSON.parse(localStorage.getItem('hitpazari-v1')||'[]')}catch(e){return[]}}
+function begen(id){try{const a=begeniler();if(!a.includes(id)){a.push(id);localStorage.setItem('hitpazari-v1',JSON.stringify(a))}}catch(e){}}
+function ktoast(m){kt.textContent=m;kt.classList.add('on');setTimeout(()=>kt.classList.remove('on'),1600)}
+function kDeste(){deste.innerHTML='';kAktif=null;
+  if(kSira>=DUKKANLAR.length){deste.innerHTML='<div class="bos"><div><b>Hepsini gördün</b><button id="bastan">Baştan başla</button></div></div>';document.getElementById('bastan').onclick=()=>{kSira=0;kDeste()};return}
+  for(let i=Math.min(kSira+1,DUKKANLAR.length-1);i>=kSira;i--){const d=DUKKANLAR[i],el=document.createElement('div');el.className='kart';
+    if(i>kSira){el.style.transform='scale(.95)'}
+    el.innerHTML=`<img src="vitrin/${d.id}.webp" alt=""><div class="bilgi"><div class="kat">${d.kategori}</div><h2>${d.ad}</h2><p>${d.sokak} · No:${d.no}</p></div><div class="damga d-like">Beğen</div><div class="damga d-nope">Geç</div><div class="damga d-gir">Dükkâna gir</div><div class="damga d-bilgi">Bilgi</div>`;
+    deste.appendChild(el);if(i===kSira)surukle(el,d)}}
+function surukle(el,d){let x0=0,y0=0,dx=0,dy=0,bas=false;
+  const st={sag:el.querySelector('.d-like'),sol:el.querySelector('.d-nope'),yukari:el.querySelector('.d-gir'),asagi:el.querySelector('.d-bilgi')};
+  const yonu=()=>{const ax=Math.abs(dx),ay=Math.abs(dy);return ax>ay?(dx>0?'sag':'sol'):(dy<0?'yukari':'asagi')};
+  const goster=()=>{const y=yonu(),m=Math.max(Math.abs(dx),Math.abs(dy));Object.keys(st).forEach(k=>st[k].style.opacity=(k===y&&m>10)?Math.min(1,m/100):0);el.style.transform=`translate(${dx}px,${dy}px) rotate(${dx*0.06}deg)`};
+  const geri=()=>{el.style.transition='transform .3s cubic-bezier(.2,.8,.2,1)';dx=dy=0;goster();Object.values(st).forEach(s=>s.style.opacity=0)};
+  el.addEventListener('pointerdown',e=>{bas=true;x0=e.clientX;y0=e.clientY;el.setPointerCapture(e.pointerId);el.style.transition='none'});
+  el.addEventListener('pointermove',e=>{if(!bas)return;dx=e.clientX-x0;dy=e.clientY-y0;goster()});
+  const birak=()=>{if(!bas)return;bas=false;if(Math.max(Math.abs(dx),Math.abs(dy))>100)karar(el,d,yonu(),geri);else geri()};
+  el.addEventListener('pointerup',birak);el.addEventListener('pointercancel',birak);
+  kAktif={el,d,geri}}
+function ucur(el,yon,sonra){const W=innerWidth*1.4,H=innerHeight*1.2;
+  el.style.transition='transform .35s ease-in';el.style.transform={sag:`translate(${W}px,40px) rotate(28deg)`,sol:`translate(${-W}px,40px) rotate(-28deg)`}[yon];setTimeout(sonra,330)}
+function ilerle(){kSira++;kDeste()}
+function karar(el,d,yon,geri){
+  if(yon==='sag'){begen(d.id);ktoast('Beğenildi');ucur(el,yon,ilerle)}
+  else if(yon==='sol')ucur(el,yon,ilerle);
+  else if(yon==='yukari'){if(d.uygulama)location.href=d.uygulama;else{ktoast('Bu dükkân yakında açılıyor');geri()}}
+  else{document.getElementById('bImg').src='vitrin/'+d.id+'.webp';document.getElementById('bAd').textContent=d.ad;
+    document.getElementById('bBilgi').textContent=d.kategori+' · '+d.sokak+' No:'+d.no;bsheet.classList.add('on')}}
+document.getElementById('bKapat').onclick=()=>{bsheet.classList.remove('on');if(kAktif)kAktif.geri()};
+document.querySelectorAll('#kdugme button').forEach(b=>b.onclick=()=>{if(kAktif)karar(kAktif.el,kAktif.d,b.dataset.y,kAktif.geri)});
+ayarla();if(zq){camZ=target=zq}
+const clamp=v=>Math.min(Math.max(v,0),TOTAL);
+wrap.addEventListener('wheel',e=>{e.preventDefault();if(Math.abs(e.deltaY)<2)return;target=clamp(target+e.deltaY*1.4)},{passive:false});
+let py=null,px0=0,py0=0,hareket=0,t0=0;
+wrap.addEventListener('pointerdown',e=>{py=e.clientY;px0=e.clientX;py0=e.clientY;hareket=0;t0=performance.now();wrap.setPointerCapture(e.pointerId)});
+wrap.addEventListener('pointermove',e=>{if(py===null)return;const dy=py-e.clientY;py=e.clientY;hareket+=Math.abs(dy);target=clamp(target+dy*4)});
+wrap.addEventListener('pointerup',e=>{if(py===null)return;py=null;
+  if(hareket<10&&Math.hypot(e.clientX-px0,e.clientY-py0)<10&&performance.now()-t0<500){const r=wrap.getBoundingClientRect();const it=pick(e.clientX-r.left,e.clientY-r.top);if(it)sec(it)}});
+wrap.addEventListener('pointercancel',()=>{py=null});
+function pick(x,y){for(let j=drawn.length-1;j>=0;j--){const it=drawn[j];if(it.op<0.15)continue;const dx=x-it.sx,dy=y-it.sy,c=Math.cos(it.rot),s=Math.sin(it.rot);
+  const u=dx*c+dy*s,v=-dx*s+dy*c;if(Math.abs(u)<=it.sw/2&&Math.abs(v)<=it.sh/2)return it}return null}
+const secim=document.getElementById('secim'),sheet=document.getElementById('sheet');let secili=null;
+function sec(it){secim.textContent=it.d.ad;secim.classList.add('on');setTimeout(()=>{secim.classList.remove('on');ac(it.d)},400)}
+function ac(d){secili=d;document.getElementById('shImg').src='vitrin/'+d.id+'.webp';document.getElementById('shAd').textContent=d.ad;
+  document.getElementById('shBilgi').textContent=d.kategori+' · '+d.sokak+' No:'+d.no;document.getElementById('yakinda').style.display='none';sheet.classList.add('on')}
+document.getElementById('kapat').onclick=()=>sheet.classList.remove('on');
+document.getElementById('gir').onclick=()=>{if(secili&&secili.uygulama)location.href=secili.uygulama;else document.getElementById('yakinda').style.display='block'};
+function render(){
+  if(mod==='kaydir'){calisiyor=false;return}
+  camZ+=(target-camZ)*0.12;if(Math.abs(target-camZ)<0.05)camZ=target;
+  document.getElementById('sonu').classList.toggle('on',mod==='sokak'&&camZ>TOTAL-180);
+  drawn=[];
+  for(const it of items){const dz=it.z+camZ;it.dz=dz;if(dz>250||dz<-7000)continue;
+    let vis=1;if(dz>0)vis*=Math.max(0,(250-dz)/250);if(dz<-5500)vis*=Math.max(0,(7000+dz)/1500);if(vis<=0.01)continue;
+    const im=IMG[it.d.id];if(!im.complete||!im.naturalWidth)continue;
+    const fog=Math.min(1,Math.max(0,(-dz-2000)/10000)),k=P/(P-dz);
+    it.op=(1-fog*0.6)*vis;it.sw=it.wf*Math.min(VW,520)*k;it.sh=it.sw*im.naturalHeight/im.naturalWidth;
+    it.sx=VW/2+(it.x*Math.min(VW,520)*0.5)*k;it.sy=VH/2+(it.y*VH*0.5)*k;
+    if(it.sx+it.sw<-50||it.sx-it.sw>VW+50||it.sy+it.sh<-50||it.sy-it.sh>VH+50)continue;drawn.push(it)}
+  drawn.sort((a,b)=>a.dz-b.dz);
+  g.setTransform(DPR,0,0,DPR,0,0);g.globalAlpha=1;g.filter='none';g.fillStyle=BG;g.fillRect(0,0,VW,VH);
+  if(mod==='sokak'){g.strokeStyle='#26262b';g.lineWidth=1;g.beginPath();
+    [[-0.95,-0.9],[0.95,-0.9],[-0.95,0.9],[0.95,0.9]].forEach(c=>{g.moveTo(VW/2,VH/2);g.lineTo(VW/2+c[0]*VW*1.2,VH/2+c[1]*VH*0.9)});g.stroke()}
+  for(const it of drawn){g.save();g.globalAlpha=it.op;g.translate(it.sx,it.sy);g.rotate(it.rot);
+    const w=it.sw,h=it.sh;g.shadowColor='rgba(0,0,0,.7)';g.shadowBlur=18*(w/300);g.shadowOffsetY=6;
+    g.fillStyle='#ddd';g.fillRect(-w/2-2,-h/2-2,w+4,h+4);g.shadowColor='transparent';
+    try{g.filter=it.f}catch(e){}
+    g.drawImage(IMG[it.d.id],-w/2,-h/2,w,h);g.filter='none';
+    g.strokeStyle='rgba(242,239,233,.55)';g.lineWidth=1.5;g.strokeRect(-w/2,-h/2,w,h);g.restore()}
+  requestAnimationFrame(render)}
+requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

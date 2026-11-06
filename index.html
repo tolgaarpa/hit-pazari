@@ -107,18 +107,20 @@ const TEKRAR=10,STEP_S=120,STEP_K=230;
 let items=[],TOTAL=0,camZ=0,target=0,drawn=[];
 function kur(){
   items=[];
-  if(mod==='sanal'){
-    const L=[];for(let t=0;t<TEKRAR;t++)DUKKANLAR.forEach(d=>L.push({d,f:FILTRE[t%FILTRE.length]}));
-    L.forEach((o,i)=>{const X=1.0,Y=0.95,per=2*(2*X+2*Y),p=((i*0.6180339)%1)*per;let xv,yv;
-      if(p<2*X){xv=-X+p;yv=-Y}else if(p<2*X+2*Y){xv=X;yv=-Y+(p-2*X)}else if(p<4*X+2*Y){xv=X-(p-2*X-2*Y);yv=Y}else{xv=-X;yv=Y-(p-4*X-2*Y)}
-      items.push({d:o.d,f:o.f,x:xv,y:yv,z:-(i*STEP_S)-250,wf:0.68,rot:(((i*0.5698)%1)-0.5)*5*Math.PI/180,sx:0,sy:0,sw:0,sh:0,op:0,dz:0})});
-    TOTAL=(L.length+1)*STEP_S;
+  if(mod==='sanal'){ // yol gibi tek sıra: iki yanda bitişik cepheler, her tekrar farklı filtre
+    const ARA=18, cur={'-1':200,'1':-110}; let i=0;
+    for(let t=0;t<TEKRAR;t++)DUKKANLAR.forEach(d=>{const side=((i++)%2)?1:-1; const W=620;
+      items.push({d,f:FILTRE[t%FILTRE.length],side,z0:cur[side],W,ar:0.9,z:cur[side]-W,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0}); cur[side]-=W+ARA});
+    TOTAL=Math.max(-cur['-1'],-cur['1'])-900;
   }else{
-    const L=DUKKANLAR.filter(d=>d.sokak===sokak).sort((a,b)=>a.no-b.no);
-    let alt=0;
-    L.forEach((d,i)=>{const side=d.aci==='sag'?-1:d.aci==='sol'?1:((alt++%2)?1:-1);
-      items.push({d,f:'none',side,z:-(i*STEP_K)-420,wf:0.6,rot:0,sx:0,sy:0,sw:0,sh:0,op:0,dz:0})});
-    TOTAL=(L.length-1)*STEP_K+900;
+    // GEÇİCİ: sokak dolu görünsün diye 8 dükkân iki tarafa da tekrar tekrar, bitişik sıra
+    const L=DUKKANLAR.filter(d=>d.sokak===sokak).sort((a,b)=>a.no-b.no).concat(DUKKANLAR.filter(d=>d.sokak!==sokak));
+    const ARA=18, cur={'-1':200,'1':-110}; let i=0;
+    for(let t=0;t<6;t++)L.forEach(d=>{const side=((i++)%2)?1:-1; const im=IMG[d.id];
+      const ar=(im&&im.naturalWidth)?im.naturalHeight/im.naturalWidth:0.9; const W=620;     // cephe yol boyunca bu kadar yer kaplar
+      items.push({d,f:'none',side,z0:cur[side],W,ar,z:cur[side]-W,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0});
+      cur[side]-=W+ARA});
+    TOTAL=Math.max(-cur['-1'],-cur['1'])-900;
   }
   camZ=target=0;
 }
@@ -200,14 +202,16 @@ function render(){
     const im=IMG[it.d.id];if(!im.complete||!im.naturalWidth)continue;
     const fog=Math.min(1,Math.max(0,(-dz-2000)/10000)),k=P/(P-dz);
     it.op=(1-fog*0.6)*vis;it.sw=it.wf*Math.min(VW,520)*k;it.sh=it.sw*im.naturalHeight/im.naturalWidth;
-    if(mod==='sokak'){const fw=Math.min(VW,520)*0.62,rw=VW*0.3,camH=VH*0.32;
-      it.sw=fw*k*0.85;it.sh=fw*k*im.naturalHeight/im.naturalWidth;
-      it.sx=VW/2+it.side*((rw+VW*0.03)*k+it.sw/2);it.sy=VH/2+camH*k-it.sh/2;it.op=vis*(1-fog*0.5)}
-    else{it.sx=VW/2+(it.x*Math.min(VW,520)*0.5)*k;it.sy=VH/2+(it.y*VH*0.5)*k}
+    if(mod!=='kaydir'){const rw=VW*0.3,camH=VH*0.32,duv=rw*1.02;
+      const zn=it.z0+camZ, zf=it.z0-it.W+camZ; if(zf>230){continue} const a=Math.min(zn,230);
+      const im2=IMG[it.d.id]; it.ar=im2.naturalHeight/im2.naturalWidth; const kn=P/(P-a), kf=P/(P-zf), H=Math.min(it.W*it.ar*0.5,camH*1.6);
+      const xn=VW/2+it.side*duv*kn, xf=VW/2+it.side*duv*kf, yb_n=VH/2+camH*kn, yb_f=VH/2+camH*kf;
+      it.q={kn,kf,a,zf,xn,xf,H,camH}; it.op=Math.min(1,Math.max(0,(7000+zf)/2500));
+      it.sx=(xn+xf)/2; it.sy=(yb_n+VH/2+(camH-H)*kn)/2; it.sw=Math.abs(xn-xf)+2; it.sh=yb_n-(VH/2+(camH-H)*kn); it.dz=a;}    else{it.sx=VW/2+(it.x*Math.min(VW,520)*0.5)*k;it.sy=VH/2+(it.y*VH*0.5)*k}
     if(it.sx+it.sw<-50||it.sx-it.sw>VW+50||it.sy+it.sh<-50||it.sy-it.sh>VH+50)continue;drawn.push(it)}
   drawn.sort((a,b)=>a.dz-b.dz);
   g.setTransform(DPR,0,0,DPR,0,0);g.globalAlpha=1;g.filter='none';g.fillStyle=BG;g.fillRect(0,0,VW,VH);
-  if(mod==='sokak'){const hx=VW/2,hy=VH/2,rw=VW*0.3,camH=VH*0.32,K=3;
+  if(mod!=='kaydir'){const hx=VW/2,hy=VH/2,rw=VW*0.3,camH=VH*0.32,K=3;
     g.fillStyle='#2b2b31';g.fillRect(0,hy,VW,VH-hy);
     g.fillStyle='#16161a';g.beginPath();g.moveTo(hx,hy);g.lineTo(hx-rw*K,hy+camH*K);g.lineTo(hx+rw*K,hy+camH*K);g.closePath();g.fill();
     g.strokeStyle='#8a867f';g.lineWidth=2;g.beginPath();[-1,1].forEach(sd=>{g.moveTo(hx,hy);g.lineTo(hx+sd*rw*K,hy+camH*K)});g.stroke();
@@ -217,6 +221,17 @@ function render(){
       g.globalAlpha=Math.max(0,Math.min(1,(7000+b)/3000));
       g.beginPath();g.moveTo(hx-wb,hy+camH*kb);g.lineTo(hx+wb,hy+camH*kb);g.lineTo(hx+wa,hy+camH*ka);g.lineTo(hx-wa,hy+camH*ka);g.fill()}
     g.globalAlpha=1}
+  if(mod!=='kaydir'){for(const it of drawn){const im=IMG[it.d.id],q=it.q,N=Math.max(24,Math.min(90,Math.round(Math.abs(q.xn-q.xf)/3)));g.globalAlpha=it.op;try{g.filter=it.f||'none'}catch(e){}
+      for(let j=0;j<N;j++){ // uzaktan yakına dilim dilim
+        const u0=j/N,u1=(j+1)/N, z0=q.zf+(q.a-q.zf)*u0, z1=q.zf+(q.a-q.zf)*u1, k0=P/(P-z0), k1=P/(P-z1);
+        const x0=VW/2+it.side*VW*0.3*1.02*k0, x1=VW/2+it.side*VW*0.3*1.02*k1;
+        // görüntü yönü: sol duvarda resmin sağ kenarı yakında, sağ duvarda sol kenarı yakında
+        const vis=(q.a-q.zf)/it.W, IW=im.naturalWidth, sw=Math.max(1,IW*vis/N);
+        const sx0=it.side<0? IW*vis*u0 : IW-IW*vis*u1;   // sol duvar: uzak uç=resmin solu; sağ duvar: uzak uç=resmin sağı
+        const top=VH/2+(q.camH-q.H)*k1, bot=VH/2+q.camH*k1, w=Math.abs(x1-x0)+1;
+        g.drawImage(im, sx0, 0, sw, im.naturalHeight, Math.min(x0,x1), top, w, bot-top)}
+      g.globalAlpha=1;g.filter='none'}
+    requestAnimationFrame(render);return}
   for(const it of drawn){g.save();g.globalAlpha=it.op;g.translate(it.sx,it.sy);g.rotate(it.rot);
     const w=it.sw,h=it.sh;g.shadowColor='rgba(0,0,0,.6)';g.shadowBlur=14*(w/300);g.shadowOffsetY=4;
     try{g.filter=it.f}catch(e){}

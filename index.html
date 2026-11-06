@@ -233,10 +233,16 @@ function render(){
         const dc=(q.a+q.zf)/2, k=P/(P-dc), ar=(im.naturalHeight||im.height)/(im.naturalWidth||im.width);
         const w=Math.min(VW*0.62, 230*k), h=w*ar, yuk=(it.kalk||0)*q.camH*k+Math.sin(performance.now()/900+(it.faz||0))*4*k;
         const cx=VW/2+it.side*(VW*0.3*(it.uz||1)*k+w*0.5), by=VH/2+q.camH*k-yuk;
-        g.save(); g.translate(cx,by-h/2); g.transform(0.9,-0.10,0,1,0,0);   // hafif yatay sıkışma + eğim = yola dönük
-        g.shadowColor='rgba(0,0,0,.55)'; g.shadowBlur=18*k; g.shadowOffsetY=10*k;
-        g.drawImage(im,-w/2,-h/2,w,h); g.restore();
-        it.sx=cx; it.sy=by-h/2; it.sw=w*0.9; it.sh=h; }
+        // gerçek perspektif: vitrinin alt çizgisi yol çizgisine paralel; dış kenar yakın (uzun), iç kenar yola bakar
+        const N=Math.max(10,Math.min(48,Math.round(w/4))), IW=im.naturalWidth||im.width, IH=im.naturalHeight||im.height, R=VW*0.3*(it.uz||1);
+        const xin=VW/2+it.side*R*k, xout=xin+it.side*w;          // iç kenar tam yol çizgisinde
+        g.save();
+        for(let j=0;j<N;j++){const u0=j/N,u1=(j+1)/N, xa=xin+(xout-xin)*u0, xb=xin+(xout-xin)*u1, xm=(xa+xb)/2;
+          const kx=Math.abs(xm-VW/2)/R, sc=kx/k, hh=h*sc, bot=VH/2+q.camH*kx-yuk*sc;
+          const su=it.side>0? u0 : 1-u1;                      // resmin solu her zaman yola yakın uçta kalmasın diye yönü çevir
+          g.drawImage(im, IW*su, 0, IW/N+0.5, IH, Math.min(xa,xb)-0.4, bot-hh, Math.abs(xb-xa)+0.8, hh)}
+        g.restore();
+        it.sx=(xin+xout)/2; it.sy=by-h/2; it.sw=w; it.sh=h*1.2; }
       g.globalAlpha=1}
     requestAnimationFrame(render);return}
   for(const it of drawn){g.save();g.globalAlpha=it.op;g.translate(it.sx,it.sy);g.rotate(it.rot);

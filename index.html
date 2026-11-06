@@ -219,7 +219,7 @@ function render(){
   drawn.sort((a,b)=>a.dz-b.dz);
   g.setTransform(DPR,0,0,DPR,0,0);g.globalAlpha=1;g.filter='none';g.fillStyle=BG;g.fillRect(0,0,VW,VH);
   if(mod!=='kaydir'){const hx=VW/2,hy=VH/2,rw=VW*0.3,camH=VH*0.32,K=3;
-    g.fillStyle='#2b2b31';g.fillRect(0,hy,VW,VH-hy);
+    
     g.fillStyle='#16161a';g.beginPath();g.moveTo(hx,hy);g.lineTo(hx-rw*K,hy+camH*K);g.lineTo(hx+rw*K,hy+camH*K);g.closePath();g.fill();
     g.strokeStyle='#8a867f';g.lineWidth=2;g.beginPath();[-1,1].forEach(sd=>{g.moveTo(hx,hy);g.lineTo(hx+sd*rw*K,hy+camH*K)});g.stroke();
     g.fillStyle='#e8c85a';const per=240,off=((camZ%per)+per)%per;
@@ -233,7 +233,7 @@ function render(){
         const dc=(q.a+q.zf)/2, k=P/(P-dc), ar=(im.naturalHeight||im.height)/(im.naturalWidth||im.width);
         const w=Math.min(VW*0.62, 230*k), h=w*ar, yuk=(it.kalk||0)*q.camH*k+Math.sin(performance.now()/900+(it.faz||0))*4*k;
         const cx=VW/2+it.side*(VW*0.3*(it.uz||1)*k+w*0.5), by=VH/2+q.camH*k-yuk;
-        g.save(); g.translate(cx,by-h/2); g.transform(0.9,it.side*0.10,0,1,0,0);   // hafif yatay sıkışma + eğim = yola dönük
+        g.save(); g.translate(cx,by-h/2); g.transform(0.9,-0.10,0,1,0,0);   // hafif yatay sıkışma + eğim = yola dönük
         g.shadowColor='rgba(0,0,0,.55)'; g.shadowBlur=18*k; g.shadowOffsetY=10*k;
         g.drawImage(im,-w/2,-h/2,w,h); g.restore();
         it.sx=cx; it.sy=by-h/2; it.sw=w*0.9; it.sh=h; }

@@ -108,9 +108,11 @@ let items=[],TOTAL=0,camZ=0,target=0,drawn=[];
 function kur(){
   items=[];
   if(mod==='sanal'){ // yol gibi tek sıra: iki yanda bitişik cepheler, her tekrar farklı filtre
-    const ARA=18, cur={'-1':200,'1':-110}; let i=0;
-    for(let t=0;t<TEKRAR;t++)DUKKANLAR.forEach(d=>{const side=((i++)%2)?1:-1; const W=620;
-      items.push({d,f:FILTRE[t%FILTRE.length],side,z0:cur[side],W,ar:0.9,z:cur[side]-W,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0}); cur[side]-=W+ARA});
+    const cur={'-1':150,'1':-60}; let i=0;
+    for(let t=0;t<TEKRAR;t++)DUKKANLAR.forEach(d=>{const r1=((i*0.6180339)%1),r2=((i*0.4142)%1),r3=((i*0.7548)%1);
+      const side=r1<0.5?-1:1; const W=340;   // kısa derinlik = sana daha dönük
+      items.push({d,f:FILTRE[t%FILTRE.length],side,z0:cur[side],W,ar:0.9,z:cur[side]-W,uz:0.95+r2*0.35,kalk:0.10+r3*0.18,faz:i*1.7,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0});
+      cur[side]-=W+120+r3*160; i++});
     TOTAL=Math.max(-cur['-1'],-cur['1'])-900;
   }else{
     // GEÇİCİ: sokak dolu görünsün diye 8 dükkân iki tarafa da tekrar tekrar, bitişik sıra
@@ -227,14 +229,14 @@ function render(){
       g.beginPath();g.moveTo(hx-wb,hy+camH*kb);g.lineTo(hx+wb,hy+camH*kb);g.lineTo(hx+wa,hy+camH*ka);g.lineTo(hx-wa,hy+camH*ka);g.fill()}
     g.globalAlpha=1}
   if(mod!=='kaydir'){for(const it of drawn){const im=hazir(it.d.id,it.f);if(!im)continue;const q=it.q,N=Math.max(6,Math.min(28,Math.round(Math.abs(q.xn-q.xf)/8)));g.globalAlpha=it.op;
-      for(let j=0;j<N;j++){ // uzaktan yakına dilim dilim
-        const u0=j/N,u1=(j+1)/N, z0=q.zf+(q.a-q.zf)*u0, z1=q.zf+(q.a-q.zf)*u1, k0=P/(P-z0), k1=P/(P-z1);
-        const x0=VW/2+it.side*VW*0.3*1.02*k0, x1=VW/2+it.side*VW*0.3*1.02*k1;
-        // görüntü yönü: sol duvarda resmin sağ kenarı yakında, sağ duvarda sol kenarı yakında
-        const vis=(q.a-q.zf)/it.W, IW=im.naturalWidth||im.width, sw=Math.max(1,IW*vis/N);
-        const sx0=it.side<0? IW*vis*u0 : IW-IW*vis*u1;   // sol duvar: uzak uç=resmin solu; sağ duvar: uzak uç=resmin sağı
-        const top=VH/2+(q.camH-q.H)*k1, bot=VH/2+q.camH*k1, w=Math.abs(x1-x0)+1;
-        g.drawImage(im, sx0, 0, sw, (im.naturalHeight||im.height), Math.min(x0,x1), top, w, bot-top)}
+      { // tek parça vitrin: sana hafif dönük, havada süzülür
+        const dc=(q.a+q.zf)/2, k=P/(P-dc), ar=(im.naturalHeight||im.height)/(im.naturalWidth||im.width);
+        const w=Math.min(VW*0.62, 230*k), h=w*ar, yuk=(it.kalk||0)*q.camH*k+Math.sin(performance.now()/900+(it.faz||0))*4*k;
+        const cx=VW/2+it.side*(VW*0.3*(it.uz||1)*k+w*0.5), by=VH/2+q.camH*k-yuk;
+        g.save(); g.translate(cx,by-h/2); g.transform(0.9,it.side*0.10,0,1,0,0);   // hafif yatay sıkışma + eğim = yola dönük
+        g.shadowColor='rgba(0,0,0,.55)'; g.shadowBlur=18*k; g.shadowOffsetY=10*k;
+        g.drawImage(im,-w/2,-h/2,w,h); g.restore();
+        it.sx=cx; it.sy=by-h/2; it.sw=w*0.9; it.sh=h; }
       g.globalAlpha=1}
     requestAnimationFrame(render);return}
   for(const it of drawn){g.save();g.globalAlpha=it.op;g.translate(it.sx,it.sy);g.rotate(it.rot);

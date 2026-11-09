@@ -117,7 +117,7 @@ function boyut(){DPR=Math.min(devicePixelRatio||1,2);const r=wrap.getBoundingCli
 boyut();addEventListener('resize',boyut);
 const IMG={};DUKKANLAR.forEach(d=>{const im=new Image();im.src='vitrin-kesik/'+d.id+'.webp';IMG[d.id]=im});
 // sahne: simge yerler ve tabelalar (dokunulmaz)
-const SAHNE=[{id:'tabela-tunali-neon',ad:'Tunalı',sahne:1},{id:'tabela-tunus',ad:'Tunus Cd.',sahne:1},{id:'kugulu',ad:'Kuğulu Park',sahne:1},
+const SAHNE=[{id:'tabela-tunus',ad:'Tunus Cd.',sahne:1},{id:'kugulu',ad:'Kuğulu Park',sahne:1},
   {id:'tabela-tunali-cadde',ad:'Tunalı Hilmi Cd.',sahne:1},{id:'tabela-bestekar',ad:'Bestekâr Sk.',sahne:1},{id:'karum',ad:'Karum',sahne:1}];
 SAHNE.forEach(d=>{const im=new Image();im.src='sahne/'+d.id+'.webp';IMG[d.id]=im});
 const ARKA=new Image();ARKA.src='sahne/sokak.webp';
@@ -131,8 +131,8 @@ function kur(){
     const cur={'-1':150,'1':-60}; let i=0;
     for(let t=0;t<TEKRAR;t++)DUKKANLAR.forEach(d=>{const r1=((i*0.6180339)%1),r2=((i*0.4142)%1),r3=((i*0.7548)%1);
       const side=r1<0.5?-1:1; const W=340;   // kısa derinlik = sana daha dönük
-      if(i>0&&i%3===0){const sd=SAHNE[(i/3-1)%SAHNE.length];items.push({d:sd,f:'none',side:-side,z0:cur[-side],W,ar:0.9,z:cur[-side]-W,uz:1.05,kalk:0.12,faz:i,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0});cur[-side]-=W+140}
-      items.push({d,f:FILTRE[t%FILTRE.length],side,z0:cur[side],W,ar:0.9,z:cur[side]-W,uz:0.95+r2*0.35,kalk:0.10+r3*0.18,faz:i*1.7,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0});
+      if(false){const sd=SAHNE[(i/3-1)%SAHNE.length];items.push({d:sd,f:'none',side:-side,z0:cur[-side],W,ar:0.9,z:cur[-side]-W,uz:1.05,kalk:0.12,faz:i,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0});cur[-side]-=W+140}
+      items.push({d,f:FILTRE[t%FILTRE.length],side,z0:cur[side],W,ar:0.9,z:cur[side]-W,uz:1,kalk:0.12,faz:i*1.7,rot:0,sx:0,sy:0,sw:0,sh:0,op:1,dz:0});
       cur[side]-=W+120+r3*160; i++});
     TOTAL=Math.max(-cur['-1'],-cur['1'])-900;
   }else{
@@ -238,7 +238,7 @@ function render(){
     if(it.sx+it.sw<-50||it.sx-it.sw>VW+50||it.sy+it.sh<-50||it.sy-it.sh>VH+50)continue;drawn.push(it)}
   drawn.sort((a,b)=>a.dz-b.dz);
   g.setTransform(DPR,0,0,DPR,0,0);g.globalAlpha=1;g.filter='none';g.fillStyle=BG;g.fillRect(0,0,VW,VH);
-  if(mod!=='kaydir'&&ARKA.complete&&ARKA.naturalWidth){const a=ARKA.naturalWidth/ARKA.naturalHeight,ch=VH,cw=ch*a,ox=(VW-cw)/2,par=Math.min(40,camZ/400);
+  if(false){const a=ARKA.naturalWidth/ARKA.naturalHeight,ch=VH,cw=ch*a,ox=(VW-cw)/2,par=Math.min(40,camZ/400);
     g.drawImage(ARKA,ox,-par,cw,ch+par);g.fillStyle='rgba(11,11,13,.35)';g.fillRect(0,0,VW,VH)}
   if(mod!=='kaydir'){const hx=VW/2,hy=VH/2,rw=VW*0.3,camH=VH*0.32,K=3;
     
@@ -253,10 +253,10 @@ function render(){
   if(mod!=='kaydir'){for(const it of drawn){const im=hazir(it.d.id,it.f);if(!im)continue;const q=it.q,N=Math.max(6,Math.min(28,Math.round(Math.abs(q.xn-q.xf)/8)));g.globalAlpha=it.op;
       { // tek parça vitrin: sana hafif dönük, havada süzülür
         const dc=(q.a+q.zf)/2, k=P/(P-dc), ar=(im.naturalHeight||im.height)/(im.naturalWidth||im.width);
-        const w=Math.min(VW*0.62, 230*k), h=w*ar, yuk=(it.kalk||0)*q.camH*k+Math.sin(performance.now()/900+(it.faz||0))*4*k;
+        const w=Math.min(VW*1.86, 690*k), h=w*ar, yuk=(it.kalk||0)*q.camH*k;
         const cx=VW/2+it.side*(VW*0.3*(it.uz||1)*k+w*0.5), by=VH/2+q.camH*k-yuk;
         // gerçek perspektif: vitrinin alt çizgisi yol çizgisine paralel; dış kenar yakın (uzun), iç kenar yola bakar
-        const N=Math.max(4,Math.min(16,Math.round(w/14))), IW=im.naturalWidth||im.width, IH=im.naturalHeight||im.height, R=VW*0.3*(it.uz||1);
+        const N=Math.max(4,Math.min(80,Math.round(w/6))), IW=im.naturalWidth||im.width, IH=im.naturalHeight||im.height, R=VW*0.3*(it.uz||1);
         const xin=VW/2+it.side*R*k, xout=xin+it.side*w;          // iç kenar tam yol çizgisinde
         g.save();
         for(let j=0;j<N;j++){const u0=j/N,u1=(j+1)/N, xa=xin+(xout-xin)*u0, xb=xin+(xout-xin)*u1, xm=(xa+xb)/2;
